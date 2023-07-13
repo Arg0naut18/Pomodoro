@@ -94,5 +94,5 @@ class Pomodoro(Tk):
 
 
 if __name__ == "__main__":
-    app = Pomodoro(session=True, session_count=1)
+    app = Pomodoro()
     app.mainloop()
