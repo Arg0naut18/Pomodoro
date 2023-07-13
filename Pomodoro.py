@@ -1,8 +1,7 @@
 import time
-import tkinter as tk
-from tkinter import Tk, messagebox
+from tkinter import Tk, messagebox, StringVar
 from tkinter import Entry, Button
-
+from loguru import logger as log
 
 class Pomodoro(Tk):
     def __init__(self, session=True, session_count=1):
@@ -10,18 +9,18 @@ class Pomodoro(Tk):
         self.geometry("300x200")
 
         # To set the app to not be able to minimizable and closable until time finishes
-        # self.attributes('-fullscreen', True)
-        # self.attributes('-topmost', True)
-        # self.protocol('WM_DELETE_WINDOW', self.prevent_exit)
+        self.attributes('-fullscreen', True)
+        self.attributes('-topmost', True)
+        self.protocol('WM_DELETE_WINDOW', self.prevent_exit)
 
         self.session = session
         self.session_count = session_count
         self.long_break = (self.session_count%4==0)
-        print("Session Count: ", self.session_count, "; Is session: ", self.session, "; Is long break: ", self.long_break)
+        log.info(f"Session Count: {self.session_count}; Is session: {self.session}; Is long break: {self.long_break}")
         
-        self.hours = tk.StringVar()
-        self.mins = tk.StringVar()
-        self.secs = tk.StringVar()
+        self.hours = StringVar(master=self, value="00")
+        self.mins = StringVar(master=self, value="00")
+        self.secs = StringVar(master=self, value="00")
 
         if self.session:
             self.title(f"Pomodoro - Session {(self.session_count+1)//2}")
@@ -52,7 +51,7 @@ class Pomodoro(Tk):
             btn = Button(self, text='Start Break', command=self.submit)
         else:
             btn = Button(self, text='Start Session', command=self.submit)
-        btn.place(x = 70,y = 120)
+        btn.place(x = 120,y = 120)
 
     def prevent_exit(self):
         pass
@@ -68,6 +67,7 @@ class Pomodoro(Tk):
     def countdown(self):
         try:
             temp = int(self.hours.get())*3600 + int(self.mins.get())*60 + int(self.secs.get())
+            log.info(f"Time spent in the session: {temp}")
         except:
             print("Please input the right value")
             return
@@ -87,9 +87,8 @@ class Pomodoro(Tk):
 
             if (temp == 0):
                 messagebox.askquestion("Time Countdown", "Do you want to continue?", icon="info")
-                new_window = self.restart(self.session, self.session_count+1)
+                self.restart(self.session, self.session_count+1)
                 self.destroy()
-                new_window.mainloop()
             temp -= 1
 
 
